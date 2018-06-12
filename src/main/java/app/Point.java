@@ -1,3 +1,5 @@
+package app;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -53,7 +55,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
+        return "app.Point{" +
                 "x=" + x +
                 ", y=" + y +
                 ", attributes=" + Arrays.toString(attributes) +

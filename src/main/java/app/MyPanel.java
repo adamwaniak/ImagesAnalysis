@@ -1,3 +1,10 @@
+package app;
+
+import app.ransac.Ransac;
+import org.apache.commons.math3.linear.RealMatrix;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,14 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
 public class MyPanel extends JPanel implements ActionListener {
     private Button selectImage1Btn = new Button("Image 1");
     private Button selectImage2Btn = new Button("Image 2");
     private Button pairPointsBtn = new Button("Pair");
-    private Button selectionBtn = new Button("Selection");
+    private Button neighboursBtn = new Button("Neighbours");
+    private Button ransacBtn = new Button("app.Ransacnsac");
     private Button clearPairsBtn = new Button("Clear");
     private Button exitBtn = new Button("Exit");
 
@@ -43,9 +48,11 @@ public class MyPanel extends JPanel implements ActionListener {
         add(selectImage2Btn);
         pairPointsBtn.setBounds(220, 5, 100, 30);
         add(pairPointsBtn);
-        selectionBtn.setBounds(330, 5, 100, 30);
-        add(selectionBtn);
-        clearPairsBtn.setBounds(440, 5, 100, 30);
+        neighboursBtn.setBounds(330, 5, 100, 30);
+        add(neighboursBtn);
+        ransacBtn.setBounds(440, 5, 100, 30);
+        add(ransacBtn);
+        clearPairsBtn.setBounds(550, 5, 100, 30);
         add(clearPairsBtn);
         exitBtn.setBounds(1570, 5, 100, 30);
         add(exitBtn);
@@ -53,7 +60,8 @@ public class MyPanel extends JPanel implements ActionListener {
         selectImage1Btn.addActionListener(this);
         selectImage2Btn.addActionListener(this);
         pairPointsBtn.addActionListener(this);
-        selectionBtn.addActionListener(this);
+        neighboursBtn.addActionListener(this);
+        ransacBtn.addActionListener(this);
         clearPairsBtn.addActionListener(this);
         exitBtn.addActionListener(this);
         repaint();
@@ -143,13 +151,13 @@ public class MyPanel extends JPanel implements ActionListener {
             allPairs.clear();
             selectedPairs.clear();
             repaint();
-        } else if (event.getSource() == selectionBtn) {
+        } else if (event.getSource() == neighboursBtn) {
             imageIPoints = fr.read(path1);
             imageJPoints = fr.read(path2);
             isEmpty = false;
 
             String s1 = JOptionPane.showInputDialog(null, "Number of checking neighbours: ", " ", JOptionPane.INFORMATION_MESSAGE);
-            String s2 = JOptionPane.showInputDialog(null, "Cohesion value: ", " ", JOptionPane.INFORMATION_MESSAGE);
+            String s2 = JOptionPane.showInputDialog(null, "app.Cohesion value: ", " ", JOptionPane.INFORMATION_MESSAGE);
             int checkingNeighbours = 100;
             double cohesionValue = 0.8;
             try {
@@ -166,10 +174,36 @@ public class MyPanel extends JPanel implements ActionListener {
             System.out.println("Time needed for cohesion: " + (double) (end - begin) / (double) 1000000000);
             System.out.println("Got points: " + selectedPairs.size());
             repaint();
+        } else if (event.getSource() == ransacBtn) {
+            System.out.println(allPairs.size());
+            String s1 = JOptionPane.showInputDialog(null, "Maximum error : ", " ", 1);
+            String s2 = JOptionPane.showInputDialog(null, "Number of iterations : ", " ", 1);
+            int maxError = 1;
+            int iter = 5;
+            try {
+                maxError = Integer.parseInt(s1);
+                iter = Integer.parseInt(s2);
+            } catch (Exception e) {
+                System.out.println("Invalid number");
+                e.printStackTrace();
+            }
+            long begin = System.nanoTime();
+            Ransac ransac = new Ransac();
+
+            System.out.println(iter + " " + maxError);
+            RealMatrix model = ransac.run(imageIPoints, imageJPoints, allPairs, iter, maxError);
+            selectedPairs = ransac.getSelectedPairs(allPairs, model, maxError);
+            long end = System.nanoTime();
+            System.out.println("Time needed for app.ransac: " + (double) (end - begin) / (double) 1000000000);
+            System.out.println("Got points: " + selectedPairs.size());
+            repaint();
         } else if (event.getSource() == exitBtn) {
             System.exit(0);
         }
     }
+
+
+
 
 }
 

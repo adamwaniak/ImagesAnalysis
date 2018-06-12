@@ -1,3 +1,6 @@
+import app.FindNeighboursAlgorithm;
+import app.Point;
+import app.SiftFileReader;
 import org.junit.Test;
 
 import java.util.Arrays;
